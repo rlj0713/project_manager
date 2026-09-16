@@ -1,18 +1,67 @@
 body {
-    font-family: Arial, sans-serif;
+    color: #17212b;
+    font-family: Georgia, serif;
     margin: 0;
-    padding: 2rem;
-    background: #f4f4f4;
+    min-height: 100vh;
+    background: #f1efe9;
+}
+
+.toolbar {
+    align-items: center;
+    background: #17212b;
+    color: #f8f5ed;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+}
+
+.brand {
+    color: #f8f5ed;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    gap: 1.25rem;
+}
+
+nav a {
+    color: #c8d0d5;
+    text-decoration: none;
+}
+
+nav a:hover,
+nav a.active {
+    color: #f2bd67;
+}
+
+.toolbar button {
+    background: transparent;
+    color: #c8d0d5;
+    font-size: 1rem;
+    padding: 0;
+}
+
+.toolbar button:hover {
+    color: #f2bd67;
 }
 
 main {
-    max-width: 40rem;
     margin: 0 auto;
+    max-width: 40rem;
 }
 
 .splash-page {
-    background: white;
-    padding: 2rem;
+    background: #fffdf8;
+    margin-top: 5rem;
+    padding: 2.5rem;
+    box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
+}
+
+.home-page {
+    min-height: calc(100vh - 4rem);
 }
 
 form {
@@ -28,12 +77,22 @@ button {
 }
 
 button {
+    background: #f2bd67;
+    border: 0;
+    color: #17212b;
     cursor: pointer;
+    font-weight: bold;
+}
+
+[hidden] {
+    display: none;
 }
 
 .admin-page {
-    background: white;
+    background: #fffdf8;
+    margin-top: 3rem;
     padding: 2rem;
+    box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
 }
 
 .admin-page form {

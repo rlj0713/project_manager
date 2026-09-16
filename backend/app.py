@@ -1,6 +1,6 @@
 import sqlite3
 
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 from auth import (
     authenticate_user,
@@ -20,6 +20,15 @@ app.config["SECRET_KEY"] = "development-only-change-me"
 
 @app.route("/")
 def index():
+    if not session.get("username"):
+        return redirect(url_for("login_page"))
+    return render_template("home.html")
+
+
+@app.route("/login")
+def login_page():
+    if session.get("username"):
+        return redirect(url_for("index"))
     return render_template("index.html")
 
 

@@ -1,6 +1,15 @@
 const createUserForm = document.getElementById('create-user-form');
 const adminMessage = document.getElementById('admin-message');
 const userList = document.getElementById('user-list');
+const logoutButton = document.getElementById('logout-button');
+const logoutMessage = document.getElementById('logout-message');
+
+logoutButton.addEventListener('click', async () => {
+    const response = await fetch('/api/logout', {method: 'POST'});
+    const data = await response.json();
+    logoutMessage.textContent = data.message;
+    if (response.ok) window.location.href = '/';
+});
 
 async function loadUsers() {
     const response = await fetch('/api/admin/users');

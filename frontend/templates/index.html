@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header class="toolbar">
+        <a class="brand" href="/">Project Management</a>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
     <main class="splash-page">
         <h1>Project Management</h1>
         <p>Sign in to continue.</p>
@@ -18,7 +24,9 @@
             <button type="submit">Sign in</button>
             <p id="login-message" role="status"></p>
         </form>
-        <a href="/admin">Admin user management</a>
+        <p id="session-message" role="status"></p>
+        <a id="admin-link" href="/admin" hidden>Admin user management</a>
+        <button id="logout-button" type="button" hidden>Log out</button>
     </main>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

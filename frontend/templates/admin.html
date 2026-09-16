@@ -7,9 +7,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header class="toolbar">
+        <a class="brand" href="/">Project Management</a>
+        <nav>
+            <a href="/">Home</a>
+            <a class="active" href="/admin">Users</a>
+        </nav>
+    </header>
     <main class="admin-page">
         <h1>User Management</h1>
         <p>Manage regular users.</p>
+        <button id="logout-button" type="button">Log out</button>
+        <p id="logout-message" role="status"></p>
         <form id="create-user-form">
             <h2>Create user</h2>
             <input name="username" placeholder="Username" required>
