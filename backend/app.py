@@ -6,7 +6,9 @@ from auth import (
     authenticate_user,
     create_regular_user,
     delete_regular_user,
-    list_regular_users,
+    get_user_profile,
+    list_users,
+    update_user_profile,
     update_regular_user,
 )
 
@@ -44,6 +46,18 @@ def admin_page():
     if not session.get("is_admin"):
         return "Admin access required", 403
     return render_template("admin.html")
+
+
+@app.route("/profile")
+def profile_page():
+    username = session.get("username")
+    if username is None:
+        return redirect(url_for("login_page"))
+
+    requested_username = request.args.get("username", username)
+    if requested_username != username and not session.get("is_admin"):
+        return "Admin access required", 403
+    return render_template("profile.html", profile_username=requested_username)
 
 
 @app.route("/api/test")
@@ -103,6 +117,49 @@ def current_user():
     )
 
 
+@app.get("/api/profile/<username>")
+def profile(username):
+    current_username = session.get("username")
+    if current_username is None:
+        return jsonify(message="Authentication required"), 401
+    if username != current_username and not session.get("is_admin"):
+        return jsonify(message="Admin access required"), 403
+
+    user_profile = get_user_profile(username)
+    if user_profile is None:
+        return jsonify(message="User not found"), 404
+    return jsonify(profile=user_profile)
+
+
+@app.put("/api/profile/<username>")
+def update_profile(username):
+    current_username = session.get("username")
+    if current_username is None:
+        return jsonify(message="Authentication required"), 401
+    if username != current_username and not session.get("is_admin"):
+        return jsonify(message="Admin access required"), 403
+
+    user_data = request.get_json(silent=True) or {}
+    required_fields = ("first_name", "last_name", "email", "start_date", "title")
+    if any(not str(user_data.get(field, "")).strip() for field in required_fields):
+        return jsonify(message="All profile fields are required"), 400
+
+    try:
+        pay_rate = float(user_data.get("pay_rate"))
+    except (TypeError, ValueError):
+        return jsonify(message="Pay rate must be a number"), 400
+    if pay_rate < 0:
+        return jsonify(message="Pay rate cannot be negative"), 400
+
+    profile_data = {
+        field: str(user_data[field]).strip() for field in required_fields
+    }
+    profile_data["pay_rate"] = pay_rate
+    if not update_user_profile(username, profile_data):
+        return jsonify(message="User not found"), 404
+    return jsonify(message="Profile updated", profile=get_user_profile(username))
+
+
 def admin_required():
     if not session.get("is_admin"):
         return jsonify(message="Admin access required"), 403
@@ -114,7 +171,7 @@ def admin_users():
     access_error = admin_required()
     if access_error:
         return access_error
-    return jsonify(users=list_regular_users())
+    return jsonify(users=list_users())
 
 
 @app.post("/api/admin/users")

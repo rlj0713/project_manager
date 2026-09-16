@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management | Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="toolbar">
+        <a class="brand" href="/">Project Management</a>
+        <nav>
+            <a href="/">Home</a>
+            <a class="active" id="profile-link" href="/profile">Profile</a>
+            {% if session.get('is_admin') %}
+            <a id="admin-link" href="/admin">User management</a>
+            {% endif %}
+            <button id="logout-button" type="button">Log out</button>
+        </nav>
+    </header>
+    <main class="profile-page">
+        <h1>Profile</h1>
+        <p id="profile-owner">Loading profile...</p>
+        <form id="profile-form" data-username="{{ profile_username }}">
+            <label for="first-name">First name</label>
+            <input id="first-name" name="first_name" required>
+            <label for="last-name">Last name</label>
+            <input id="last-name" name="last_name" required>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required>
+            <label for="start-date">Start date</label>
+            <input id="start-date" name="start_date" type="date" required>
+            <label for="title">Title</label>
+            <input id="title" name="title" required>
+            <label for="pay-rate">Current pay rate</label>
+            <input id="pay-rate" name="pay_rate" type="number" min="0" step="0.01" required>
+            <button type="submit">Save profile</button>
+            <p id="profile-message" role="status"></p>
+        </form>
+        {% if session.get('is_admin') and profile_username != session.get('username') %}
+        <section class="danger-zone">
+            <h2>Delete user</h2>
+            <p>This permanently removes the user account.</p>
+            <button id="delete-user-button" type="button">Delete user</button>
+            <p id="delete-message" role="status"></p>
+        </section>
+        {% endif %}
+    </main>
+    <script src="{{ url_for('static', filename='account.js') }}"></script>
+    <script src="{{ url_for('static', filename='profile.js') }}"></script>
+</body>
+</html>

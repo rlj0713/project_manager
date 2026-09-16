@@ -95,8 +95,27 @@ button {
     box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
 }
 
+.profile-page {
+    background: #fffdf8;
+    margin-top: 3rem;
+    max-width: 32rem;
+    padding: 2rem;
+    box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
+}
+
 .admin-page form {
     margin-bottom: 1.5rem;
+}
+
+.danger-zone {
+    border-top: 1px solid #d8cfc1;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+}
+
+.danger-zone button {
+    background: #a94336;
+    color: #fffdf8;
 }
 
 li {

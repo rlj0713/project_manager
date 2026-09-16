@@ -28,12 +28,52 @@ def authenticate_user(username, password):
     return {"username": user["username"], "is_admin": bool(user["is_admin"])}
 
 
-def list_regular_users():
+def list_users():
     with get_connection() as connection:
         users = connection.execute(
-            "SELECT username FROM users WHERE is_admin = 0 ORDER BY username"
+            "SELECT username, is_admin FROM users ORDER BY username"
         ).fetchall()
-    return [{"username": user["username"]} for user in users]
+    return [
+        {"username": user["username"], "is_admin": bool(user["is_admin"])}
+        for user in users
+    ]
+
+
+def get_user_profile(username):
+    with get_connection() as connection:
+        user = connection.execute(
+            """
+            SELECT username, first_name, last_name, email, start_date, title, pay_rate
+            FROM users
+            WHERE username = ?
+            """,
+            (username,),
+        ).fetchone()
+    if user is None:
+        return None
+    return dict(user)
+
+
+def update_user_profile(username, profile):
+    with get_connection() as connection:
+        connection.execute(
+            """
+            UPDATE users
+            SET first_name = ?, last_name = ?, email = ?, start_date = ?,
+                title = ?, pay_rate = ?
+            WHERE username = ?
+            """,
+            (
+                profile["first_name"],
+                profile["last_name"],
+                profile["email"],
+                profile["start_date"],
+                profile["title"],
+                profile["pay_rate"],
+                username,
+            ),
+        )
+        return connection.total_changes > 0
 
 
 def create_regular_user(username, password):

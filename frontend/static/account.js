@@ -1,4 +1,5 @@
 const homeLink = document.getElementById('home-link');
+const profileLink = document.getElementById('profile-link');
 const adminLink = document.getElementById('admin-link');
 const registerLink = document.getElementById('register-link');
 const logoutButton = document.getElementById('logout-button');
@@ -6,6 +7,7 @@ const logoutButton = document.getElementById('logout-button');
 function updateAccount(data) {
     const authenticated = data.authenticated ?? true;
     homeLink.hidden = false;
+    if (profileLink) profileLink.hidden = !authenticated;
     if (adminLink) adminLink.hidden = !authenticated || !data.is_admin;
     registerLink.hidden = authenticated;
     logoutButton.hidden = !authenticated;

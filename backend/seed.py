@@ -18,7 +18,13 @@ def seed_users():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 password_hash BLOB NOT NULL,
-                is_admin INTEGER NOT NULL DEFAULT 0
+                is_admin INTEGER NOT NULL DEFAULT 0,
+                first_name TEXT NOT NULL DEFAULT '',
+                last_name TEXT NOT NULL DEFAULT '',
+                email TEXT NOT NULL DEFAULT '',
+                start_date TEXT NOT NULL DEFAULT '',
+                title TEXT NOT NULL DEFAULT '',
+                pay_rate REAL NOT NULL DEFAULT 0
             )
             """
         )
@@ -31,6 +37,19 @@ def seed_users():
             connection.execute(
                 "ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"
             )
+        profile_columns = {
+            "first_name": "TEXT NOT NULL DEFAULT ''",
+            "last_name": "TEXT NOT NULL DEFAULT ''",
+            "email": "TEXT NOT NULL DEFAULT ''",
+            "start_date": "TEXT NOT NULL DEFAULT ''",
+            "title": "TEXT NOT NULL DEFAULT ''",
+            "pay_rate": "REAL NOT NULL DEFAULT 0",
+        }
+        for column, definition in profile_columns.items():
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE users ADD COLUMN {column} {definition}"
+                )
 
         for username, user_data in SEED_USERS.items():
             password_hash = bcrypt.hashpw(

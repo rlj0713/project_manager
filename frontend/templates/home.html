@@ -11,6 +11,7 @@
         <a class="brand" href="/">Project Management</a>
         <nav>
             <a class="active" id="home-link" href="/">Home</a>
+            <a id="profile-link" href="/profile">Profile</a>
             <a id="register-link" href="/register" hidden>Register</a>
             {% if session.get('is_admin') %}
             <a id="admin-link" href="/admin">User management</a>
