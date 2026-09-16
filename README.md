@@ -13,6 +13,9 @@ Open http://127.0.0.1:5000/ in a browser. Signed-out visitors are sent to the
 login screen automatically. After signing in, the home page is intentionally
 blank until project functionality is added.
 
+New users can register at http://127.0.0.1:5000/register. Public registration
+always creates a regular, non-admin user.
+
 Initialize the development users once:
 
 ```bash

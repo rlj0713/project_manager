@@ -55,7 +55,8 @@ main {
 
 .splash-page {
     background: #fffdf8;
-    margin-top: 5rem;
+    margin: 5rem auto 0;
+    max-width: 28rem;
     padding: 2.5rem;
     box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
 }
@@ -67,7 +68,6 @@ main {
 form {
     display: grid;
     gap: 0.75rem;
-    max-width: 20rem;
 }
 
 input,

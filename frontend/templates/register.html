@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Management | Sign In</title>
+    <title>Project Management | Register</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <a class="brand" href="/">Project Management</a>
         <nav>
             <a id="home-link" href="/">Home</a>
-            <a id="register-link" href="/register">Register</a>
+            <a id="register-link" class="active" href="/register">Register</a>
             {% if session.get('is_admin') %}
             <a id="admin-link" href="/admin">User management</a>
             {% endif %}
@@ -19,18 +19,18 @@
         </nav>
     </header>
     <main class="splash-page">
-        <h1>Project Management</h1>
-        <p>Sign in to continue.</p>
-        <form id="login-form">
+        <h1>Create an account</h1>
+        <p>Register as a regular user.</p>
+        <form id="register-form">
             <label for="username">Username</label>
             <input id="username" name="username" required>
             <label for="password">Password</label>
             <input id="password" name="password" type="password" required>
-            <button type="submit">Sign in</button>
-            <p id="login-message" role="status"></p>
+            <button type="submit">Register</button>
+            <p id="register-message" role="status"></p>
         </form>
     </main>
     <script src="{{ url_for('static', filename='account.js') }}"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='register.js') }}"></script>
 </body>
 </html>

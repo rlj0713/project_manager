@@ -10,15 +10,15 @@
     <header class="toolbar">
         <a class="brand" href="/">Project Management</a>
         <nav>
-            <a href="/">Home</a>
-            <a class="active" href="/admin">Users</a>
+            <a id="home-link" href="/">Home</a>
+            <a id="register-link" href="/register" hidden>Register</a>
+            <a class="active" id="admin-link" href="/admin">User management</a>
+            <button id="logout-button" type="button">Log out</button>
         </nav>
     </header>
     <main class="admin-page">
         <h1>User Management</h1>
         <p>Manage regular users.</p>
-        <button id="logout-button" type="button">Log out</button>
-        <p id="logout-message" role="status"></p>
         <form id="create-user-form">
             <h2>Create user</h2>
             <input name="username" placeholder="Username" required>
@@ -31,6 +31,7 @@
             <ul id="user-list"></ul>
         </section>
     </main>
+    <script src="{{ url_for('static', filename='account.js') }}"></script>
     <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
 </html>

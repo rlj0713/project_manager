@@ -32,6 +32,13 @@ def login_page():
     return render_template("index.html")
 
 
+@app.route("/register")
+def register_page():
+    if session.get("username"):
+        return redirect(url_for("index"))
+    return render_template("register.html")
+
+
 @app.route("/admin")
 def admin_page():
     if not session.get("is_admin"):
@@ -61,6 +68,21 @@ def login():
         username=user["username"],
         is_admin=user["is_admin"],
     )
+
+
+@app.post("/api/register")
+def register():
+    user_data = request.get_json(silent=True) or {}
+    username = user_data.get("username", "").strip()
+    password = user_data.get("password", "")
+    if not username or not password:
+        return jsonify(message="Username and password are required"), 400
+
+    try:
+        create_regular_user(username, password)
+    except sqlite3.IntegrityError:
+        return jsonify(message="Username already exists"), 409
+    return jsonify(message="Registration successful"), 201
 
 
 @app.post("/api/logout")
