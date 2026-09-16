@@ -14,6 +14,7 @@ from auth import (
 from projects import (
     create_project_with_tasks,
     get_project,
+    get_task_dates,
     list_projects_with_tasks,
     update_task_dates,
     update_project_with_tasks,
@@ -286,10 +287,6 @@ def update_admin_project(project_id):
 
 @app.put("/api/admin/tasks/<int:task_id>")
 def update_admin_task(task_id):
-    access_error = admin_required()
-    if access_error:
-        return access_error
-
     task_data = request.get_json(silent=True) or {}
     task_updates = task_data.get("tasks") or [dict(task_data, id=task_id)]
     normalized_updates = []
@@ -313,6 +310,15 @@ def update_admin_task(task_id):
 
     if task_id not in [task["id"] for task in normalized_updates]:
         return jsonify(message="Task update does not match route"), 400
+    if not session.get("is_admin"):
+        existing_dates = get_task_dates([task["id"] for task in normalized_updates])
+        if any(
+            task["id"] not in existing_dates
+            or task["start_date"] != existing_dates[task["id"]]["start_date"]
+            or task["end_date"] != existing_dates[task["id"]]["end_date"]
+            for task in normalized_updates
+        ):
+            return jsonify(message="Only administrators can move budgeted timelines"), 403
     try:
         project_id = update_task_dates(normalized_updates)
     except ValueError as error:

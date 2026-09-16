@@ -63,7 +63,7 @@ function updateProjectBudgetBar(project, budgetBar, previewTasks) {
 }
 
 function createResizeHandle(task, bar, edge, dates, adjacentTask, project, budgetBar) {
-    if (!isAdmin) return;
+    if (!isAdmin && dates.type === 'budget') return;
     const adjacentDates = adjacentTask && (
         dates.type === 'budget' ||
         (adjacentTask.actual_start_date && adjacentTask.actual_end_date)

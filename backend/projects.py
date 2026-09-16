@@ -259,6 +259,18 @@ def update_task_dates(task_updates):
     return task["project_id"]
 
 
+def get_task_dates(task_ids):
+    initialize_project_tables()
+    placeholders = ",".join("?" for _ in task_ids)
+    with get_connection() as connection:
+        tasks = connection.execute(
+            f"SELECT id, start_date, end_date FROM tasks "
+            f"WHERE id IN ({placeholders})",
+            task_ids,
+        ).fetchall()
+    return {task["id"]: dict(task) for task in tasks}
+
+
 def create_project_with_tasks(name, start_date, tasks):
     initialize_project_tables()
     project_end_date = max(task["end_date"] for task in tasks)
