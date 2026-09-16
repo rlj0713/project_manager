@@ -219,8 +219,12 @@ def create_admin_project():
         title = str(task.get("title", "")).strip()
         task_start = str(task.get("start_date", "")).strip()
         task_end = str(task.get("end_date", "")).strip()
-        if not title or not task_start or not task_end:
-            return jsonify(message="Each task needs a title and dates"), 400
+        actual_start = str(task.get("actual_start_date", "")).strip()
+        actual_end = str(task.get("actual_end_date", "")).strip()
+        if not title or not task_start or not task_end or not actual_start or not actual_end:
+            return jsonify(message="Each task needs budgeted and actual dates"), 400
+        if actual_start > actual_end:
+            return jsonify(message="Actual start date cannot be after end date"), 400
         try:
             labor_hours = float(task.get("labor_hours"))
             material_cost = float(task.get("material_cost"))
@@ -237,6 +241,8 @@ def create_admin_project():
                 "labor_hours": labor_hours,
                 "material_cost": material_cost,
                 "subcontractor_cost": subcontractor_cost,
+                "actual_start_date": actual_start,
+                "actual_end_date": actual_end,
             }
         )
 
@@ -297,6 +303,7 @@ def update_admin_task(task_id):
             "end_date": str(task.get("end_date", "")).strip(),
             "actual_start_date": str(task.get("actual_start_date", "")).strip(),
             "actual_end_date": str(task.get("actual_end_date", "")).strip(),
+            "completed": bool(task.get("completed", False)),
         }
         if not dates["id"] or not dates["start_date"] or not dates["end_date"]:
             return jsonify(message="Budgeted task dates are required"), 400

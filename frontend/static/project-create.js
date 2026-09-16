@@ -11,6 +11,8 @@ function addTaskFields() {
         <input name="title" placeholder="Task name" required>
         <label>Start date <input name="start_date" type="date" required></label>
         <label>Target end date <input name="end_date" type="date" required></label>
+        <label>Actual start date <input name="actual_start_date" type="date" required></label>
+        <label>Actual end date <input name="actual_end_date" type="date" required></label>
         <label>Budgeted labor hours <input name="labor_hours" type="number" min="0" step="0.25" required></label>
         <label>Budgeted material costs <input name="material_cost" type="number" min="0" step="0.01" required></label>
         <label>Budgeted subcontractor costs <input name="subcontractor_cost" type="number" min="0" step="0.01" required></label>
@@ -23,6 +25,8 @@ function collectTasks() {
         title: task.querySelector('[name="title"]').value,
         start_date: task.querySelector('[name="start_date"]').value,
         end_date: task.querySelector('[name="end_date"]').value,
+        actual_start_date: task.querySelector('[name="actual_start_date"]').value,
+        actual_end_date: task.querySelector('[name="actual_end_date"]').value,
         labor_hours: task.querySelector('[name="labor_hours"]').value,
         material_cost: task.querySelector('[name="material_cost"]').value,
         subcontractor_cost: task.querySelector('[name="subcontractor_cost"]').value,

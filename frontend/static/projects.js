@@ -164,6 +164,22 @@ function createResizeHandle(task, bar, edge, dates, adjacentTask, project, budge
     bar.appendChild(handle);
 }
 
+function createCompletionCheckbox(task, actualBar) {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'completion-checkbox';
+    checkbox.checked = task.completed;
+    checkbox.title = 'Mark task complete';
+    checkbox.addEventListener('click', (event) => event.stopPropagation());
+    checkbox.addEventListener('change', async () => {
+        task.completed = checkbox.checked;
+        actualBar.classList.toggle('completed', task.completed);
+        actualBar.classList.toggle('incomplete', !task.completed);
+        await saveTaskDates(task);
+    });
+    actualBar.appendChild(checkbox);
+}
+
 async function saveTaskDates(task, adjacentTask) {
     const tasks = [task, ...(adjacentTask ? [adjacentTask] : [])].map((item) => ({
         id: item.id,
@@ -171,6 +187,7 @@ async function saveTaskDates(task, adjacentTask) {
         end_date: item.end_date,
         actual_start_date: item.actual_start_date || '',
         actual_end_date: item.actual_end_date || '',
+        completed: Boolean(item.completed),
     }));
     const response = await fetch(`/api/admin/tasks/${task.id}`, {
         method: 'PUT',
@@ -264,25 +281,37 @@ function buildTimeline() {
             }, nextTask, project, budgetBar);
             track.appendChild(budgetTask);
 
-            if (task.actual_start_date && task.actual_end_date) {
+            {
                 const actualBar = document.createElement('div');
-            actualBar.className = `task-bar actual-bar ${task.completed ? 'completed' : 'incomplete'}`;
                 actualBar.dataset.taskId = task.id;
                 actualBar.dataset.barType = 'actual';
-                actualBar.style.left = `${dayOffset(task.actual_start_date) * dayWidth}px`;
-                actualBar.style.width = `${dayCount(task.actual_start_date, task.actual_end_date) * dayWidth}px`;
+                const hasActualDates = task.actual_start_date && task.actual_end_date;
+                actualBar.className = hasActualDates
+                    ? `task-bar actual-bar ${task.completed ? 'completed' : 'incomplete'}`
+                    : `actual-placeholder ${task.completed ? 'completed' : 'incomplete'}`;
+                actualBar.style.left = `${dayOffset(
+                    hasActualDates ? task.actual_start_date : task.start_date,
+                ) * dayWidth}px`;
+                if (hasActualDates) {
+                    actualBar.style.width = `${dayCount(task.actual_start_date, task.actual_end_date) * dayWidth}px`;
+                }
                 actualBar.title = taskDetails(task, 'Actual');
-                actualBar.textContent = `Actual: ${task.title}`;
-                createResizeHandle(task, actualBar, 'start', {
-                    type: 'actual',
-                    start: task.actual_start_date,
-                    end: task.actual_end_date,
-                }, previousTask, project, budgetBar);
-                createResizeHandle(task, actualBar, 'end', {
-                    type: 'actual',
-                    start: task.actual_start_date,
-                    end: task.actual_end_date,
-                }, nextTask, project, budgetBar);
+                actualBar.textContent = hasActualDates
+                    ? `Actual: ${task.title}`
+                    : 'Not started';
+                createCompletionCheckbox(task, actualBar);
+                if (hasActualDates) {
+                    createResizeHandle(task, actualBar, 'start', {
+                        type: 'actual',
+                        start: task.actual_start_date,
+                        end: task.actual_end_date,
+                    }, previousTask, project, budgetBar);
+                    createResizeHandle(task, actualBar, 'end', {
+                        type: 'actual',
+                        start: task.actual_start_date,
+                        end: task.actual_end_date,
+                    }, nextTask, project, budgetBar);
+                }
                 track.appendChild(actualBar);
             }
         });

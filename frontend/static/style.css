@@ -253,10 +253,11 @@ main {
 }
 
 .task-bar {
+    box-sizing: border-box;
     border-radius: 0.2rem;
     color: white;
     font-size: 0.75rem;
-    overflow: visible;
+    overflow: hidden;
     height: 1.6rem;
     line-height: 1.6rem;
     padding: 0 0.5rem;
@@ -287,7 +288,7 @@ main {
     height: 1.6rem;
     left: 0;
     line-height: 1.6rem;
-    overflow: visible;
+    overflow: hidden;
     padding: 0 0.35rem;
     position: absolute;
     text-overflow: ellipsis;
@@ -310,11 +311,11 @@ main {
 }
 
 .resize-handle.start {
-    left: -0.3rem;
+    left: 0;
 }
 
 .resize-handle.end {
-    right: -0.3rem;
+    right: 0;
 }
 
 .resize-handle:hover,
@@ -340,6 +341,43 @@ main {
     background: color-mix(in srgb, var(--project-color) 35%, white);
     border: 1px solid color-mix(in srgb, var(--project-color) 60%, white);
     color: #17212b;
+}
+
+.actual-placeholder {
+    background: color-mix(in srgb, var(--project-color) 18%, white);
+    border: 1px dashed color-mix(in srgb, var(--project-color) 55%, white);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    overflow: hidden;
+    padding: 0 0.35rem;
+    position: absolute;
+    text-align: center;
+    text-overflow: ellipsis;
+    top: 2.35rem;
+    white-space: nowrap;
+    width: 4.5rem;
+}
+
+.actual-placeholder.completed {
+    background: color-mix(in srgb, var(--project-color) 50%, white);
+    border-style: solid;
+}
+
+.completion-checkbox {
+    accent-color: var(--project-color);
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 0.9rem;
+    margin: 0;
+    padding: 0 !important;
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.9rem;
+    z-index: 4;
 }
 
 .task-bar.actual-bar {

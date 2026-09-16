@@ -55,6 +55,20 @@ def seed_sample_projects():
             "SELECT COUNT(*) FROM projects"
         ).fetchone()[0]
         if project_count:
+            actual_dates = {
+                "Discovery": ("2026-09-01", "2026-09-07"),
+                "Implementation": ("2026-09-15", "2026-09-25"),
+                "Launch": ("2026-10-01", "2026-10-12"),
+                "Collect inputs": ("2026-10-01", "2026-10-12"),
+                "Review": ("2026-10-15", "2026-11-01"),
+                "Publish plan": ("2026-11-06", "2026-11-18"),
+            }
+            for title, dates in actual_dates.items():
+                connection.execute(
+                    "UPDATE tasks SET actual_start_date = ?, actual_end_date = ? "
+                    "WHERE title = ? AND actual_start_date = ''",
+                    (*dates, title),
+                )
             return
 
         projects = [
@@ -89,6 +103,23 @@ def seed_sample_projects():
             """,
             tasks,
         )
+        actual_dates = {
+            "Discovery": ("2026-09-01", "2026-09-07"),
+            "Implementation": ("2026-09-15", "2026-09-25"),
+            "Launch": ("2026-10-01", "2026-10-12"),
+            "User research": ("2026-09-10", "2026-09-20"),
+            "Prototype": ("2026-09-24", "2026-10-10"),
+            "Pilot": ("2026-10-15", "2026-11-05"),
+            "Collect inputs": ("2026-10-01", "2026-10-12"),
+            "Review": ("2026-10-15", "2026-11-01"),
+            "Publish plan": ("2026-11-06", "2026-11-18"),
+        }
+        for title, dates in actual_dates.items():
+            connection.execute(
+                "UPDATE tasks SET actual_start_date = ?, actual_end_date = ? "
+                "WHERE title = ?",
+                (*dates, title),
+            )
 
 
 def list_projects_with_tasks():
@@ -207,7 +238,7 @@ def update_task_dates(task_updates):
                 """
                 UPDATE tasks
                 SET start_date = ?, end_date = ?,
-                    actual_start_date = ?, actual_end_date = ?
+                    actual_start_date = ?, actual_end_date = ?, completed = ?
                 WHERE id = ? AND project_id = ?
                 """,
                 (
@@ -215,6 +246,7 @@ def update_task_dates(task_updates):
                     dates["end_date"],
                     dates["actual_start_date"],
                     dates["actual_end_date"],
+                    dates["completed"],
                     dates["id"],
                     task["project_id"],
                 ),
@@ -287,8 +319,9 @@ def create_project_with_tasks(name, start_date, tasks):
             """
             INSERT INTO tasks
                 (project_id, title, start_date, end_date, completed,
-                 labor_hours, material_cost, subcontractor_cost)
-            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+                  labor_hours, material_cost, subcontractor_cost,
+                  actual_start_date, actual_end_date)
+              VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
             """,
             [
                 (
@@ -299,6 +332,8 @@ def create_project_with_tasks(name, start_date, tasks):
                     task["labor_hours"],
                     task["material_cost"],
                     task["subcontractor_cost"],
+                    task["actual_start_date"],
+                    task["actual_end_date"],
                 )
                 for task in tasks
             ],
