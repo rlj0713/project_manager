@@ -26,6 +26,9 @@
                 <h1>Project timeline</h1>
                 <p>Track project work across time. Dark segments are complete; light segments are in progress.</p>
             </div>
+            {% if session.get('is_admin') %}
+            <button id="create-project-button" type="button">Create new project</button>
+            {% endif %}
             <label class="zoom-control" for="timeline-zoom">
                 <span>Zoom</span>
                 <input id="timeline-zoom" type="range" min="12" max="42" value="24">
@@ -38,7 +41,34 @@
             </div>
         </section>
     </main>
+    {% if session.get('is_admin') %}
+    <dialog id="project-dialog" class="project-dialog">
+        <form id="project-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">Admin action</p>
+                    <h2>Create new project</h2>
+                </div>
+                <button id="close-project-button" class="close-button" type="button" aria-label="Close">&times;</button>
+            </div>
+            <label for="project-name">Project name</label>
+            <input id="project-name" name="name" required>
+            <label for="project-start-date">Project start date</label>
+            <input id="project-start-date" name="start_date" type="date" required>
+            <div class="task-heading">
+                <h3>Tasks</h3>
+                <button id="add-task-button" type="button">Add task</button>
+            </div>
+            <div id="task-fields"></div>
+            <p id="project-message" role="status"></p>
+            <button type="submit">Create project</button>
+        </form>
+    </dialog>
+    {% endif %}
     <script src="{{ url_for('static', filename='account.js') }}"></script>
     <script src="{{ url_for('static', filename='projects.js') }}"></script>
+    {% if session.get('is_admin') %}
+    <script src="{{ url_for('static', filename='project-create.js') }}"></script>
+    {% endif %}
 </body>
 </html>

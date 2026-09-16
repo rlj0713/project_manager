@@ -101,4 +101,5 @@ async function loadProjects() {
 }
 
 zoomControl.addEventListener('input', buildTimeline);
+window.refreshProjects = loadProjects;
 loadProjects();

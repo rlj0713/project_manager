@@ -65,7 +65,6 @@ def seed_users():
                 (username, password_hash, user_data["is_admin"]),
             )
 
-
 if __name__ == "__main__":
     seed_users()
     seed_sample_projects()

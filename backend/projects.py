@@ -22,10 +22,26 @@ def initialize_project_tables():
                 start_date TEXT NOT NULL,
                 end_date TEXT NOT NULL,
                 completed INTEGER NOT NULL DEFAULT 0,
+                labor_hours REAL NOT NULL DEFAULT 0,
+                material_cost REAL NOT NULL DEFAULT 0,
+                subcontractor_cost REAL NOT NULL DEFAULT 0,
                 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
             )
             """
         )
+        columns = {
+            column[1]
+            for column in connection.execute("PRAGMA table_info(tasks)").fetchall()
+        }
+        for column, definition in {
+            "labor_hours": "REAL NOT NULL DEFAULT 0",
+            "material_cost": "REAL NOT NULL DEFAULT 0",
+            "subcontractor_cost": "REAL NOT NULL DEFAULT 0",
+        }.items():
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE tasks ADD COLUMN {column} {definition}"
+                )
 
 
 def seed_sample_projects():
@@ -79,7 +95,8 @@ def list_projects_with_tasks():
         ).fetchall()
         tasks = connection.execute(
             """
-            SELECT id, project_id, title, start_date, end_date, completed
+            SELECT id, project_id, title, start_date, end_date, completed,
+                labor_hours, material_cost, subcontractor_cost
             FROM tasks
             ORDER BY start_date, id
             """
@@ -94,6 +111,9 @@ def list_projects_with_tasks():
                 "start_date": task["start_date"],
                 "end_date": task["end_date"],
                 "completed": bool(task["completed"]),
+                "labor_hours": task["labor_hours"],
+                "material_cost": task["material_cost"],
+                "subcontractor_cost": task["subcontractor_cost"],
             }
         )
 
@@ -107,3 +127,38 @@ def list_projects_with_tasks():
         }
         for project in projects
     ]
+
+
+def create_project_with_tasks(name, start_date, tasks):
+    initialize_project_tables()
+    project_end_date = max(task["end_date"] for task in tasks)
+    with get_connection() as connection:
+        project = connection.execute(
+            """
+            INSERT INTO projects (name, start_date, end_date)
+            VALUES (?, ?, ?)
+            RETURNING id
+            """,
+            (name, start_date, project_end_date),
+        ).fetchone()
+        connection.executemany(
+            """
+            INSERT INTO tasks
+                (project_id, title, start_date, end_date, completed,
+                 labor_hours, material_cost, subcontractor_cost)
+            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+            """,
+            [
+                (
+                    project["id"],
+                    task["title"],
+                    task["start_date"],
+                    task["end_date"],
+                    task["labor_hours"],
+                    task["material_cost"],
+                    task["subcontractor_cost"],
+                )
+                for task in tasks
+            ],
+        )
+    return project["id"]

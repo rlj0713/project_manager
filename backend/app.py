@@ -11,7 +11,7 @@ from auth import (
     update_user_profile,
     update_regular_user,
 )
-from projects import list_projects_with_tasks
+from projects import create_project_with_tasks, list_projects_with_tasks
 
 app = Flask(
     __name__,
@@ -180,6 +180,51 @@ def admin_users():
     if access_error:
         return access_error
     return jsonify(users=list_users())
+
+
+@app.post("/api/admin/projects")
+def create_admin_project():
+    access_error = admin_required()
+    if access_error:
+        return access_error
+
+    project_data = request.get_json(silent=True) or {}
+    name = str(project_data.get("name", "")).strip()
+    start_date = str(project_data.get("start_date", "")).strip()
+    tasks = project_data.get("tasks", [])
+    if not name or not start_date or not isinstance(tasks, list) or not tasks:
+        return jsonify(message="Project name, start date, and tasks are required"), 400
+
+    normalized_tasks = []
+    for task in tasks:
+        if not isinstance(task, dict):
+            return jsonify(message="Each task must be an object"), 400
+        title = str(task.get("title", "")).strip()
+        task_start = str(task.get("start_date", "")).strip()
+        task_end = str(task.get("end_date", "")).strip()
+        if not title or not task_start or not task_end:
+            return jsonify(message="Each task needs a title and dates"), 400
+        try:
+            labor_hours = float(task.get("labor_hours"))
+            material_cost = float(task.get("material_cost"))
+            subcontractor_cost = float(task.get("subcontractor_cost"))
+        except (TypeError, ValueError):
+            return jsonify(message="Task budgets must be numbers"), 400
+        if min(labor_hours, material_cost, subcontractor_cost) < 0:
+            return jsonify(message="Task budgets cannot be negative"), 400
+        normalized_tasks.append(
+            {
+                "title": title,
+                "start_date": task_start,
+                "end_date": task_end,
+                "labor_hours": labor_hours,
+                "material_cost": material_cost,
+                "subcontractor_cost": subcontractor_cost,
+            }
+        )
+
+    project_id = create_project_with_tasks(name, start_date, normalized_tasks)
+    return jsonify(message="Project created", project_id=project_id), 201
 
 
 @app.post("/api/admin/users")
