@@ -62,7 +62,146 @@ main {
 }
 
 .home-page {
-    min-height: calc(100vh - 4rem);
+    margin: 0 auto;
+    max-width: 88rem;
+    padding: 3rem 2rem;
+}
+
+.eyebrow {
+    color: #b26d1c;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+}
+
+.timeline-header {
+    align-items: end;
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.timeline-header h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    margin: 0;
+}
+
+.timeline-header p:not(.eyebrow) {
+    color: #58616a;
+    margin-bottom: 0;
+    max-width: 42rem;
+}
+
+.zoom-control {
+    align-items: center;
+    color: #58616a;
+    display: flex;
+    gap: 0.75rem;
+    white-space: nowrap;
+}
+
+.zoom-control input {
+    accent-color: #b26d1c;
+    padding: 0;
+}
+
+.timeline-panel {
+    background: #fffdf8;
+    box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
+    padding: 1.25rem;
+}
+
+.timeline-status {
+    color: #58616a;
+    padding: 2rem;
+    text-align: center;
+}
+
+.timeline-scroll {
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+}
+
+.timeline {
+    min-width: calc(14rem + var(--timeline-width));
+}
+
+.timeline-date-header,
+.project-row {
+    display: grid;
+    grid-template-columns: 14rem var(--timeline-width);
+}
+
+.timeline-date-header {
+    border-bottom: 1px solid #d8cfc1;
+    color: #58616a;
+    font-size: 0.75rem;
+    min-height: 2rem;
+}
+
+.project-label {
+    border-right: 1px solid #d8cfc1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+.project-label small {
+    color: #7b858d;
+    margin-top: 0.25rem;
+}
+
+.date-track,
+.project-track {
+    background-image: repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent calc(var(--day-width) - 1px),
+        #e8e1d7 calc(var(--day-width) - 1px),
+        #e8e1d7 var(--day-width)
+    );
+    display: flex;
+    width: var(--timeline-width);
+}
+
+.date-track span {
+    flex: 0 0 var(--day-width);
+    padding: 0.5rem 0.25rem;
+}
+
+.project-row {
+    min-height: 5rem;
+}
+
+.project-track {
+    align-items: center;
+    position: relative;
+}
+
+.task-bar {
+    border-radius: 0.2rem;
+    color: white;
+    font-size: 0.75rem;
+    overflow: hidden;
+    padding: 0.6rem 0.5rem;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 1.45rem;
+    white-space: nowrap;
+}
+
+.task-bar.completed {
+    background: var(--project-color);
+}
+
+.task-bar.incomplete {
+    background: color-mix(in srgb, var(--project-color) 28%, white);
+    border: 1px solid color-mix(in srgb, var(--project-color) 55%, white);
+    color: #17212b;
 }
 
 form {

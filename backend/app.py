@@ -11,6 +11,7 @@ from auth import (
     update_user_profile,
     update_regular_user,
 )
+from projects import list_projects_with_tasks
 
 app = Flask(
     __name__,
@@ -63,6 +64,13 @@ def profile_page():
 @app.route("/api/test")
 def api_test():
     return jsonify(message="API is working")
+
+
+@app.get("/api/projects")
+def projects():
+    if not session.get("username"):
+        return jsonify(message="Authentication required"), 401
+    return jsonify(projects=list_projects_with_tasks())
 
 
 @app.post("/api/login")

@@ -19,7 +19,26 @@
             <button id="logout-button" type="button">Log out</button>
         </nav>
     </header>
-    <main class="home-page"></main>
+    <main class="home-page">
+        <section class="timeline-header">
+            <div>
+                <p class="eyebrow">Portfolio view</p>
+                <h1>Project timeline</h1>
+                <p>Track project work across time. Dark segments are complete; light segments are in progress.</p>
+            </div>
+            <label class="zoom-control" for="timeline-zoom">
+                <span>Zoom</span>
+                <input id="timeline-zoom" type="range" min="12" max="42" value="24">
+            </label>
+        </section>
+        <section class="timeline-panel" aria-label="Project timeline">
+            <div id="timeline-status" class="timeline-status">Loading projects...</div>
+            <div id="timeline-scroll" class="timeline-scroll" hidden>
+                <div id="timeline" class="timeline"></div>
+            </div>
+        </section>
+    </main>
     <script src="{{ url_for('static', filename='account.js') }}"></script>
+    <script src="{{ url_for('static', filename='projects.js') }}"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 import bcrypt
 
 from auth import get_connection
+from projects import seed_sample_projects
 
 
 SEED_USERS = {
@@ -67,4 +68,5 @@ def seed_users():
 
 if __name__ == "__main__":
     seed_users()
+    seed_sample_projects()
     print("Seeded users: alice (admin), bob (non-admin), carol (non-admin)")
