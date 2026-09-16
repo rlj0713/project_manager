@@ -33,6 +33,84 @@ function shiftDate(dateString, days) {
     return date.toISOString().slice(0, 10);
 }
 
+function shiftTask(task, type, days) {
+    if (type === 'budget') {
+        task.start_date = shiftDate(task.start_date, days);
+        task.end_date = shiftDate(task.end_date, days);
+    } else if (task.actual_start_date && task.actual_end_date) {
+        task.actual_start_date = shiftDate(task.actual_start_date, days);
+        task.actual_end_date = shiftDate(task.actual_end_date, days);
+    }
+}
+
+function getShiftLimit(task, project, type, direction) {
+    const datedTasks = project.tasks
+        .filter((candidate) => type === 'budget'
+            ? candidate.id !== task.id
+            : candidate.id !== task.id && candidate.actual_start_date && candidate.actual_end_date)
+        .sort((first, second) => {
+            const firstDate = type === 'budget' ? first.start_date : first.actual_start_date;
+            const secondDate = type === 'budget' ? second.start_date : second.actual_start_date;
+            return firstDate.localeCompare(secondDate);
+        });
+    const currentStart = type === 'budget' ? task.start_date : task.actual_start_date;
+    const currentIndex = datedTasks.findIndex((candidate) => {
+        const candidateStart = type === 'budget' ? candidate.start_date : candidate.actual_start_date;
+        return candidateStart > currentStart;
+    });
+    const previous = currentIndex === -1 ? datedTasks[datedTasks.length - 1] : datedTasks[currentIndex - 1];
+    const next = currentIndex === -1 ? null : datedTasks[currentIndex];
+    if (direction < 0 && previous) {
+        const previousEnd = type === 'budget' ? previous.end_date : previous.actual_end_date;
+        const currentStartDate = type === 'budget' ? task.start_date : task.actual_start_date;
+        return Math.floor((parseDate(previousEnd) - parseDate(currentStartDate)) / dayMilliseconds) + 1;
+    }
+    if (direction > 0 && next) {
+        const nextStart = type === 'budget' ? next.start_date : next.actual_start_date;
+        const currentEnd = type === 'budget' ? task.end_date : task.actual_end_date;
+        return Math.ceil((parseDate(nextStart) - parseDate(currentEnd)) / dayMilliseconds) - 1;
+    }
+    return direction < 0 ? -3650 : 3650;
+}
+
+function createTaskMoveHandler(task, bar, type, project, budgetBar) {
+    if (!isAdmin && type === 'budget') return;
+    bar.addEventListener('pointerdown', (event) => {
+        if (event.target.closest('.resize-handle, .completion-checkbox, .task-label')) return;
+        event.preventDefault();
+        bar.classList.add('dragging');
+        bar.setPointerCapture(event.pointerId);
+        const startX = event.clientX;
+        const originalTask = {...task};
+        const dayWidth = Number(zoomControl.value);
+        let appliedDays = 0;
+
+        const move = (moveEvent) => {
+            const requestedDays = Math.round((moveEvent.clientX - startX) / dayWidth);
+            const direction = Math.sign(requestedDays);
+            const limit = getShiftLimit(originalTask, project, type, direction);
+            const days = Math.max(-Math.abs(limit), Math.min(Math.abs(limit), requestedDays));
+            if (days === appliedDays) return;
+            Object.assign(task, originalTask);
+            shiftTask(task, type, days);
+            appliedDays = days;
+            updateBar(task, type);
+            if (type === 'budget') updateProjectBudgetBar(project, budgetBar, new Map([[task.id, task]]));
+        };
+
+        const finish = async () => {
+            bar.removeEventListener('pointermove', move);
+            bar.removeEventListener('pointerup', finish);
+            bar.releasePointerCapture(event.pointerId);
+            bar.classList.remove('dragging');
+            if (appliedDays) await saveTaskDates(task);
+        };
+
+        bar.addEventListener('pointermove', move);
+        bar.addEventListener('pointerup', finish, {once: true});
+    });
+}
+
 function updateBar(task, type) {
     const bar = document.querySelector(
         `[data-task-id="${task.id}"][data-bar-type="${type}"]`,
@@ -268,7 +346,11 @@ function buildTimeline() {
             budgetTask.style.left = `${dayOffset(task.start_date) * dayWidth}px`;
             budgetTask.style.width = `${dayCount(task.start_date, task.end_date) * dayWidth}px`;
             budgetTask.title = taskDetails(task, 'Budgeted');
-            budgetTask.textContent = task.title;
+            const budgetLabel = document.createElement('span');
+            budgetLabel.className = 'task-label';
+            budgetLabel.textContent = task.title;
+            budgetTask.appendChild(budgetLabel);
+            createTaskMoveHandler(task, budgetTask, 'budget', project, budgetBar);
             createResizeHandle(task, budgetTask, 'start', {
                 type: 'budget',
                 start: task.start_date,
@@ -296,10 +378,14 @@ function buildTimeline() {
                     actualBar.style.width = `${dayCount(task.actual_start_date, task.actual_end_date) * dayWidth}px`;
                 }
                 actualBar.title = taskDetails(task, 'Actual');
-                actualBar.textContent = hasActualDates
+                const actualLabel = document.createElement('span');
+                actualLabel.className = 'task-label';
+                actualLabel.textContent = hasActualDates
                     ? `Actual: ${task.title}`
                     : 'Not started';
+                actualBar.appendChild(actualLabel);
                 createCompletionCheckbox(task, actualBar);
+                createTaskMoveHandler(task, actualBar, 'actual', project, budgetBar);
                 if (hasActualDates) {
                     createResizeHandle(task, actualBar, 'start', {
                         type: 'actual',

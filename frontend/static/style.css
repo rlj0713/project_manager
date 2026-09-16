@@ -256,6 +256,7 @@ main {
     box-sizing: border-box;
     border-radius: 0.2rem;
     color: white;
+    cursor: move;
     font-size: 0.75rem;
     overflow: hidden;
     height: 1.6rem;
@@ -285,6 +286,7 @@ main {
     border-right: 2px solid rgba(255, 253, 248, 0.9);
     box-sizing: border-box;
     color: #f8f5ed;
+    cursor: move;
     height: 1.6rem;
     left: 0;
     line-height: 1.6rem;
@@ -294,8 +296,14 @@ main {
     text-overflow: ellipsis;
     top: 0.75rem;
     white-space: nowrap;
-    z-index: 1;
+    z-index: 3;
 }
+
+    .budget-task-marker.dragging,
+    .task-bar.dragging,
+    .actual-placeholder.dragging {
+        z-index: 10;
+    }
 
 .resize-handle {
     background: transparent;
@@ -324,6 +332,10 @@ main {
     outline: none;
 }
 
+.task-label {
+    pointer-events: auto;
+}
+
 .budget-task-marker span {
     display: inline-block;
     max-width: 100%;
@@ -348,6 +360,7 @@ main {
     border: 1px dashed color-mix(in srgb, var(--project-color) 55%, white);
     border-radius: 0.2rem;
     box-sizing: border-box;
+    cursor: move;
     height: 1.6rem;
     line-height: 1.6rem;
     overflow: hidden;
