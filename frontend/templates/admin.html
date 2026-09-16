@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="admin-page">
+        <h1>User Management</h1>
+        <p>Manage regular users.</p>
+        <form id="create-user-form">
+            <h2>Create user</h2>
+            <input name="username" placeholder="Username" required>
+            <input name="password" type="password" placeholder="Password" required>
+            <button type="submit">Create user</button>
+        </form>
+        <p id="admin-message" role="status"></p>
+        <section>
+            <h2>Regular users</h2>
+            <ul id="user-list"></ul>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+backend/users.db
+__pycache__/
+*.pyc

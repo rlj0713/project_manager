@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Management</title>
+    <title>Project Management | Sign In</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <main>
+    <main class="splash-page">
         <h1>Project Management</h1>
-        <p id="api-response">Checking the API...</p>
+        <p>Sign in to continue.</p>
+        <form id="login-form">
+            <label for="username">Username</label>
+            <input id="username" name="username" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required>
+            <button type="submit">Sign in</button>
+            <p id="login-message" role="status"></p>
+        </form>
+        <a href="/admin">Admin user management</a>
     </main>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
