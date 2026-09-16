@@ -215,6 +215,17 @@ main {
     margin-top: 0.25rem;
 }
 
+.project-label a {
+    color: #17212b;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.project-label a:hover {
+    color: #b26d1c;
+    text-decoration: underline;
+}
+
 .date-track,
 .project-track {
     background-image: repeating-linear-gradient(
@@ -238,7 +249,6 @@ main {
 }
 
 .project-track {
-    align-items: center;
     position: relative;
 }
 
@@ -246,22 +256,94 @@ main {
     border-radius: 0.2rem;
     color: white;
     font-size: 0.75rem;
-    overflow: hidden;
-    padding: 0.6rem 0.5rem;
+    overflow: visible;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    padding: 0 0.5rem;
     position: absolute;
     text-overflow: ellipsis;
-    top: 1.45rem;
+    top: 2.35rem;
     white-space: nowrap;
 }
 
-.task-bar.completed {
+.project-budget-bar {
     background: var(--project-color);
+    border-radius: 0.2rem;
+    color: #f8f5ed;
+    height: 1.6rem;
+    left: 0;
+    line-height: 1.6rem;
+    overflow: hidden;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 0.75rem;
+    white-space: nowrap;
 }
 
-.task-bar.incomplete {
-    background: color-mix(in srgb, var(--project-color) 28%, white);
-    border: 1px solid color-mix(in srgb, var(--project-color) 55%, white);
+.budget-task-marker {
+    border-right: 2px solid rgba(255, 253, 248, 0.9);
+    box-sizing: border-box;
+    color: #f8f5ed;
+    height: 1.6rem;
+    left: 0;
+    line-height: 1.6rem;
+    overflow: visible;
+    padding: 0 0.35rem;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 0.75rem;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.resize-handle {
+    background: transparent;
+    border: 0;
+    cursor: ew-resize;
+    height: 100%;
+    min-width: 0.6rem;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 0.6rem;
+    z-index: 3;
+}
+
+.resize-handle.start {
+    left: -0.3rem;
+}
+
+.resize-handle.end {
+    right: -0.3rem;
+}
+
+.resize-handle:hover,
+.resize-handle:focus-visible {
+    background: rgba(255, 253, 248, 0.55);
+    outline: none;
+}
+
+.budget-task-marker span {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
+.actual-bar.completed {
+    background: color-mix(in srgb, var(--project-color) 78%, white);
     color: #17212b;
+}
+
+.actual-bar.incomplete {
+    background: color-mix(in srgb, var(--project-color) 35%, white);
+    border: 1px solid color-mix(in srgb, var(--project-color) 60%, white);
+    color: #17212b;
+}
+
+.task-bar.actual-bar {
+    border-radius: 0.2rem;
 }
 
 form {
@@ -300,6 +382,28 @@ button {
     max-width: 32rem;
     padding: 2rem;
     box-shadow: 0 1rem 2rem rgba(23, 33, 43, 0.08);
+}
+
+.edit-task {
+    border: 1px solid #d8cfc1;
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+.task-budget-summary {
+    color: #58616a;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    gap: 0.75rem 1.25rem;
+}
+
+.edit-task label {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
 }
 
 .admin-page form {

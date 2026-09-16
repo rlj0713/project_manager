@@ -11,7 +11,13 @@ from auth import (
     update_user_profile,
     update_regular_user,
 )
-from projects import create_project_with_tasks, list_projects_with_tasks
+from projects import (
+    create_project_with_tasks,
+    get_project,
+    list_projects_with_tasks,
+    update_task_dates,
+    update_project_with_tasks,
+)
 
 app = Flask(
     __name__,
@@ -47,6 +53,16 @@ def admin_page():
     if not session.get("is_admin"):
         return "Admin access required", 403
     return render_template("admin.html")
+
+
+@app.route("/admin/projects/<int:project_id>/edit")
+def edit_project_page(project_id):
+    if not session.get("is_admin"):
+        return "Admin access required", 403
+    project = get_project(project_id)
+    if project is None:
+        return "Project not found", 404
+    return render_template("edit_project.html", project=project)
 
 
 @app.route("/profile")
@@ -225,6 +241,85 @@ def create_admin_project():
 
     project_id = create_project_with_tasks(name, start_date, normalized_tasks)
     return jsonify(message="Project created", project_id=project_id), 201
+
+
+@app.put("/api/admin/projects/<int:project_id>")
+def update_admin_project(project_id):
+    access_error = admin_required()
+    if access_error:
+        return access_error
+
+    project_data = request.get_json(silent=True) or {}
+    name = str(project_data.get("name", "")).strip()
+    start_date = str(project_data.get("start_date", "")).strip()
+    end_date = str(project_data.get("end_date", "")).strip()
+    tasks = project_data.get("tasks", [])
+    if not name or not start_date or not end_date:
+        return jsonify(message="Project name and dates are required"), 400
+    if not isinstance(tasks, list):
+        return jsonify(message="Tasks must be a list"), 400
+
+    normalized_tasks = []
+    for task in tasks:
+        if not isinstance(task, dict) or not task.get("id"):
+            return jsonify(message="Each task needs an id"), 400
+        actual_start = str(task.get("actual_start_date", "")).strip()
+        actual_end = str(task.get("actual_end_date", "")).strip()
+        if bool(actual_start) != bool(actual_end):
+            return jsonify(message="Actual start and end dates must be entered together"), 400
+        if actual_start and actual_start > actual_end:
+            return jsonify(message="Actual start date cannot be after actual end date"), 400
+        normalized_tasks.append(
+            {
+                "id": task["id"],
+                "actual_start_date": actual_start,
+                "actual_end_date": actual_end,
+            }
+        )
+
+    if not update_project_with_tasks(
+        project_id, name, start_date, end_date, normalized_tasks
+    ):
+        return jsonify(message="Project not found"), 404
+    return jsonify(message="Project updated", project=get_project(project_id))
+
+
+@app.put("/api/admin/tasks/<int:task_id>")
+def update_admin_task(task_id):
+    access_error = admin_required()
+    if access_error:
+        return access_error
+
+    task_data = request.get_json(silent=True) or {}
+    task_updates = task_data.get("tasks") or [dict(task_data, id=task_id)]
+    normalized_updates = []
+    for task in task_updates:
+        dates = {
+            "id": task.get("id"),
+            "start_date": str(task.get("start_date", "")).strip(),
+            "end_date": str(task.get("end_date", "")).strip(),
+            "actual_start_date": str(task.get("actual_start_date", "")).strip(),
+            "actual_end_date": str(task.get("actual_end_date", "")).strip(),
+        }
+        if not dates["id"] or not dates["start_date"] or not dates["end_date"]:
+            return jsonify(message="Budgeted task dates are required"), 400
+        if dates["start_date"] > dates["end_date"]:
+            return jsonify(message="Budgeted start date cannot be after end date"), 400
+        if bool(dates["actual_start_date"]) != bool(dates["actual_end_date"]):
+            return jsonify(message="Actual start and end dates must be entered together"), 400
+        if dates["actual_start_date"] and dates["actual_start_date"] > dates["actual_end_date"]:
+            return jsonify(message="Actual start date cannot be after actual end date"), 400
+        normalized_updates.append(dates)
+
+    if task_id not in [task["id"] for task in normalized_updates]:
+        return jsonify(message="Task update does not match route"), 400
+    try:
+        project_id = update_task_dates(normalized_updates)
+    except ValueError as error:
+        return jsonify(message=str(error)), 409
+    if project_id is None:
+        return jsonify(message="Task not found"), 404
+    return jsonify(message="Task dates updated", project_id=project_id)
 
 
 @app.post("/api/admin/users")

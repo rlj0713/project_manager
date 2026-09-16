@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management | Edit Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="toolbar">
+        <a class="brand" href="/">Project Management</a>
+        <nav>
+            <a href="/">Home</a>
+            <a class="active" href="/admin/projects/{{ project.id }}/edit">Edit project</a>
+            <button id="logout-button" type="button">Log out</button>
+        </nav>
+    </header>
+    <main class="profile-page">
+        <p class="eyebrow">Admin action</p>
+        <h1>Edit project</h1>
+        <form id="edit-project-form" data-project-id="{{ project.id }}">
+            <label for="project-name">Project name</label>
+            <input id="project-name" name="name" value="{{ project.name }}" required>
+            <label for="project-start-date">Start date</label>
+            <input id="project-start-date" name="start_date" type="date" value="{{ project.start_date }}" required>
+            <label for="project-end-date">End date</label>
+            <input id="project-end-date" name="end_date" type="date" value="{{ project.end_date }}" required>
+            <h2>Tasks</h2>
+            <p>Budgeted dates and costs are shown for reference. Record actual dates as work progresses.</p>
+            <div id="project-tasks">
+                {% for task in project.tasks %}
+                <fieldset class="edit-task" data-task-id="{{ task.id }}">
+                    <legend>{{ task.title }}</legend>
+                    <div class="task-budget-summary">
+                        <span>Budgeted: {{ task.start_date }} to {{ task.end_date }}</span>
+                        <span>{{ task.labor_hours }} labor hours</span>
+                        <span>${{ '%.2f'|format(task.material_cost) }} materials</span>
+                        <span>${{ '%.2f'|format(task.subcontractor_cost) }} subcontractor</span>
+                    </div>
+                    <label>Actual start date
+                        <input name="actual_start_date" type="date" value="{{ task.actual_start_date }}">
+                    </label>
+                    <label>Actual end date
+                        <input name="actual_end_date" type="date" value="{{ task.actual_end_date }}">
+                    </label>
+                </fieldset>
+                {% endfor %}
+            </div>
+            <button type="submit">Save project</button>
+            <p id="edit-project-message" role="status"></p>
+        </form>
+    </main>
+    <script src="{{ url_for('static', filename='account.js') }}"></script>
+    <script src="{{ url_for('static', filename='edit-project.js') }}"></script>
+</body>
+</html>

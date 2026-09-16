@@ -19,7 +19,7 @@
             <button id="logout-button" type="button">Log out</button>
         </nav>
     </header>
-    <main class="home-page">
+    <main class="home-page" data-admin="{{ 'true' if session.get('is_admin') else 'false' }}">
         <section class="timeline-header">
             <div>
                 <p class="eyebrow">Portfolio view</p>
